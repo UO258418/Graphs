@@ -46,6 +46,7 @@ public class Graph<T> extends GraphAbstract<T> {
 		if(node == null)
 			throw new NullPointerException("Element to remove is null.");
 
+		numNodes--;
 		int nodeIndex = getNode(node);
 
 		for(int i = 0; i < getSize(); i++)
