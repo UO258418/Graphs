@@ -2,12 +2,16 @@ package p2graphs;
 
 public class Graph<T> extends GraphAbstract<T> {
 
-	private final static int INDEX_NOT_FOUND = -1;
+	public final static int INDEX_NOT_FOUND = -1;
+	public final static int EMPTY = -1;
+	public final static double INFINITE = Double.MAX_VALUE;
 
 	public Graph(int maxSize) {
 		super(maxSize);
 		edges = new boolean[maxSize][maxSize];
 		weights = new double[maxSize][maxSize];
+		pFloyd = new int[getSize()][getSize()];
+		aFloyd = new double[getSize()][getSize()];
 	}
 
 	public int getSize() {
@@ -182,9 +186,17 @@ public class Graph<T> extends GraphAbstract<T> {
 	}
 
 
-	public boolean floyd() {
-		// Completad el metodo...
-		return false;
+	public void floyd(int iterations) {
+		initsFloyd();
+		for(int k = 0; k < iterations; k++)
+			for(int i = 0; i < getSize(); i++)
+				for(int j = 0; j < getSize(); j++) {
+					double costThroughPivot = weights[i][k] + weights[k][j];
+					if(costThroughPivot < aFloyd[i][j]) {
+						aFloyd[i][j] = costThroughPivot;
+						pFloyd[i][j] = k;
+					}
+				}
 	}
 
 
@@ -221,4 +233,33 @@ public class Graph<T> extends GraphAbstract<T> {
 	}
 
 
+	public String traverseGraphDF(T element) {
+		boolean visited[] = new boolean[getSize()];
+		int nodeIndex = getNode(element);
+		return nodeIndex == INDEX_NOT_FOUND ? null : DFPrint(nodeIndex, visited);
+	}
+
+	private String DFPrint(int currentIndex, boolean[] visited) {
+		String result = nodes[currentIndex].toString() + "-";
+		visited[currentIndex] = true;
+		for(int i = 0; i < getSize(); i++) {
+			if(existsEdge(nodes[currentIndex], nodes[i]) && !visited[i])
+				result += DFPrint(i, visited);
+		}
+
+		return result;
+	}
+
+	private void initsFloyd() {
+		for(int i = 0; i < getSize(); i++)
+			for(int j = 0; j < getSize(); j++) {
+				// Fill aFloyd
+				if(i == j) aFloyd[i][j] = 0;
+				else if(edges[i][j]) aFloyd[i][j] = weights[i][j];
+				else aFloyd[i][j] = INFINITE;
+
+				// Fill pFloyd
+				pFloyd[i][j] = EMPTY;
+			}
+	}
 }

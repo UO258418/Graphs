@@ -128,7 +128,7 @@ public class BasicGraphTest {
 
 		assertFalse(g1.removeNode('X'));
 		assertTrue(g1.removeNode('a'));
-		//assertEquals(INDEX_NOT_FOUND, g1.removeNode('a'));
+		assertEquals(INDEX_NOT_FOUND, g1.getNode('a'));
 		assertEquals(2, g1.getSize());
 
 		assertFalse(g1.existsEdge('a', 'c'));
@@ -170,7 +170,7 @@ public class BasicGraphTest {
 
 		assertTrue(g1.removeNode('c'));
 
-		//assertEquals(INDEX_NOT_FOUND, g1.removeNode('c'));
+		assertEquals(INDEX_NOT_FOUND, g1.getNode('c'));
 		assertEquals(0, g1.getSize());
 		/*assertArrayEquals(new boolean[][] { { false, false, true }, { false, false, true }, { true, false, false } },
 				g1.getEdges());*/
