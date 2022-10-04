@@ -2,9 +2,12 @@ package p2graphs;
 
 public class Graph<T> extends GraphAbstract<T> {
 
+	private final static int INDEX_NOT_FOUND = -1;
+
 	public Graph(int maxSize) {
 		super(maxSize);
-
+		edges = new boolean[maxSize][maxSize];
+		weights = new double[maxSize][maxSize];
 	}
 
 	public int getSize() {
@@ -15,28 +18,29 @@ public class Graph<T> extends GraphAbstract<T> {
 		if(node == null)
 			throw new NullPointerException("Element to find is null.");
 
-		// Completad el metodo...
 		for(int i = 0; i < getSize(); i++) {
 			if(nodes[i].equals(node))
 				return i;
 		}
 
-		return -2;
+		return INDEX_NOT_FOUND;
 	}
 
 	public boolean addNode(T node) throws NullPointerException, FullStructureException{
-		// Completad el metodo...
 		if(node == null)
 			throw new NullPointerException("Element to insert is null.");
-//
+
 		if(getSize() == nodes.length)
 			throw new FullStructureException(node);
 
-		for(int i = 0; i < nodes.length; i++)
-			if(nodes[i] == null) {
-				nodes[i] = node;
-				return true;
-			}
+		if(!existsNode(node)) {
+			for(int i = 0; i < nodes.length; i++)
+				if(nodes[i] == null) {
+					nodes[i] = node;
+					numNodes++;
+					return true;
+				}
+		}
 
 		return false;
 	}
@@ -46,24 +50,42 @@ public class Graph<T> extends GraphAbstract<T> {
 		if(node == null)
 			throw new NullPointerException("Element to remove is null.");
 
-		numNodes--;
 		int nodeIndex = getNode(node);
+		if(nodeIndex == INDEX_NOT_FOUND)
+			return false;
 
-		for(int i = 0; i < getSize(); i++)
-			for(int j = 0; j < getSize(); j++)
-				if(i == nodeIndex || j == nodeIndex)
-					removeEdge(nodes[i], nodes[j]);
+		int lastNode = getSize() - 1;
 
-		if(nodeIndex == getSize() - 1) {
+		// remove node
+		if(nodeIndex == lastNode) {
 			nodes[nodeIndex] = null;
-			return true;
 		}
 
 		else{
+			nodes[nodeIndex] = nodes[lastNode];
+			nodes[lastNode] = null;
 
+			// copy edges and weights to its new position
+			edges[nodeIndex][nodeIndex] = edges[lastNode][lastNode];
+			for(int i = 0; i < getSize() - 1; i++) {
+				if(i != nodeIndex) {
+					edges[nodeIndex][i] = edges[lastNode][i];
+					edges[i][nodeIndex] = edges[i][lastNode];
+
+					weights[nodeIndex][i] = weights[lastNode][i];
+					weights[i][nodeIndex] = weights[i][lastNode];
+				}
+			}
 		}
 
-		return false;
+		// remove edges
+		for(int i = 0; i < getSize(); i++) {
+			edges[lastNode][i] = false;
+			edges[i][lastNode] = false;
+		}
+
+		numNodes--;
+		return true;
 	}
 
 
@@ -88,6 +110,9 @@ public class Graph<T> extends GraphAbstract<T> {
 
 		int sourceIndex = getNode(source);
 		int targetIndex = getNode(target);
+		if(sourceIndex == INDEX_NOT_FOUND || targetIndex == INDEX_NOT_FOUND)
+			return false;
+
 		return edges[sourceIndex][targetIndex];
 	}
 
@@ -104,7 +129,7 @@ public class Graph<T> extends GraphAbstract<T> {
 
 		if(edgeWeight <= 0)
 			throw new IllegalArgumentException(
-					"Weight edge could not be less or equals to 0");
+					"Weight edge could not be less or equal to 0");
 
 		if(!existsEdge(source, target)) {
 			int sourceIndex = getNode(source);
@@ -184,6 +209,15 @@ public class Graph<T> extends GraphAbstract<T> {
 	public double minCostPath(T origen, T destino) {
 		// Implementad el metodo...
 		return -1;
+	}
+
+
+    public boolean[][] getEdges() {
+		return edges;
+    }
+
+	public double[][] getWeight() {
+		return weights;
 	}
 
 
