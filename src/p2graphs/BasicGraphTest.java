@@ -175,7 +175,7 @@ public class BasicGraphTest {
 		/*assertArrayEquals(new boolean[][] { { false, false, true }, { false, false, true }, { true, false, false } },
 				g1.getEdges());*/
 
-		assertTrue( g1.addNode('a'));
+		assertTrue(g1.addNode('a'));
 
 		assertTrue(g1.addNode('b'));
 
