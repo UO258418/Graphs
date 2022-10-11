@@ -168,6 +168,7 @@ public class Graph<T> extends GraphAbstract<T> {
 			int sourceIndex = getNode(source);
 			int targetIndex = getNode(target);
 			edges[sourceIndex][targetIndex] = false;
+			weights[sourceIndex][targetIndex] = 0.0;
 			return true;
 		}
 
