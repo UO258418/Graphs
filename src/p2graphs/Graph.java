@@ -4,7 +4,7 @@ public class Graph<T> extends GraphAbstract<T> {
 
 	public final static int INDEX_NOT_FOUND = -1;
 	public final static int EMPTY = -1;
-	public final static double INFINITE = Double.MAX_VALUE;
+	public final static double INFINITE = Double.POSITIVE_INFINITY;
 
 	public Graph(int maxSize) {
 		super(maxSize);
@@ -224,6 +224,7 @@ public class Graph<T> extends GraphAbstract<T> {
 		return recursivePrintFloyd(sourceIndex, pFloyd[sourceIndex][pivot]) + nodes[pivot].toString();
 	}
 
+
 	public String recorridoProfundidad(T nodo) {
 		// Completad el metodo...
 		return "";
@@ -237,8 +238,50 @@ public class Graph<T> extends GraphAbstract<T> {
 
 
 	public DijkstraDataClass dijkstra(T nodoOrigen) {
-		// Completad el metodo...
-		return null;
+		if(!existsNode(nodoOrigen))
+			return null;
+
+		double D[] = new double[getSize()];
+		int PD[] = new int[getSize()];
+		int nodeIndex = getNode(nodoOrigen);
+		initsDijkstra(D, PD, nodeIndex);
+
+		boolean sSet[] = new boolean[getSize()];
+		sSet[nodeIndex] = true;
+
+		int pivot = getPivot(D, sSet);
+
+		while(pivot != EMPTY) {
+			sSet[pivot] = true; // set the pivot as visited
+			for(int i = 0; i < getSize(); i++) {
+				if(edges[pivot][i]) {
+					double costThroughPivot = D[pivot] + weights[pivot][i];
+					if (costThroughPivot < D[i]) {
+						D[i] = costThroughPivot;
+						PD[i] = pivot;
+					}
+				}
+			}
+
+			pivot = getPivot(D, sSet);
+		}
+
+		return new DijkstraDataClass(getSize(), nodeIndex, D, PD);
+	}
+
+	private int getPivot(double[] D, boolean[] sSet) {
+		int pivot = EMPTY;
+		double minWeight = INFINITE;
+		for(int i = 0; i < getSize(); i++) {
+			if(!sSet[i]) {
+				if (D[i] < minWeight) {
+					minWeight = D[i];
+					pivot = i;
+				}
+			}
+		}
+
+		return pivot;
 	}
 
 
@@ -285,6 +328,20 @@ public class Graph<T> extends GraphAbstract<T> {
 				// Fill pFloyd
 				pFloyd[i][j] = EMPTY;
 			}
+	}
+
+	private void initsDijkstra(double[] D, int[] PD, int elementIndex) {
+		for(int i = 0; i < getSize(); i++) {
+			if(elementIndex == i) {
+				D[i] = 0;
+				PD[i] = elementIndex;
+			}
+
+			else {
+				D[i] = edges[elementIndex][i] ? weights[elementIndex][i] : INFINITE;
+				PD[i] = edges[elementIndex][i] ? elementIndex : EMPTY;
+			}
+		}
 	}
 
 }
