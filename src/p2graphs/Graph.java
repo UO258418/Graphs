@@ -10,8 +10,16 @@ public class Graph<T> extends GraphAbstract<T> {
 		super(maxSize);
 		edges = new boolean[maxSize][maxSize];
 		weights = new double[maxSize][maxSize];
-		pFloyd = new int[getSize()][getSize()];
-		aFloyd = new double[getSize()][getSize()];
+		pFloyd = new int[maxSize][maxSize];
+		aFloyd = new double[maxSize][maxSize];
+	}
+
+	public double[][] getA() {
+		return aFloyd;
+	}
+
+	public int[][] getP() {
+		return pFloyd;
 	}
 
 	public int getSize() {
@@ -42,6 +50,13 @@ public class Graph<T> extends GraphAbstract<T> {
 				if(nodes[i] == null) {
 					nodes[i] = node;
 					numNodes++;
+
+					// remove edges
+					for(int j = 0; j < getSize(); j++) {
+						edges[i][j] = false;
+						edges[j][i] = false;
+					}
+
 					return true;
 				}
 		}
@@ -80,12 +95,6 @@ public class Graph<T> extends GraphAbstract<T> {
 					weights[i][nodeIndex] = weights[i][lastNode];
 				}
 			}
-		}
-
-		// remove edges
-		for(int i = 0; i < getSize(); i++) {
-			edges[lastNode][i] = false;
-			edges[i][lastNode] = false;
 		}
 
 		numNodes--;
@@ -159,7 +168,6 @@ public class Graph<T> extends GraphAbstract<T> {
 			int sourceIndex = getNode(source);
 			int targetIndex = getNode(target);
 			edges[sourceIndex][targetIndex] = false;
-			weights[sourceIndex][targetIndex] = Integer.MAX_VALUE;
 			return true;
 		}
 
@@ -191,7 +199,7 @@ public class Graph<T> extends GraphAbstract<T> {
 		for(int k = 0; k < iterations; k++)
 			for(int i = 0; i < getSize(); i++)
 				for(int j = 0; j < getSize(); j++) {
-					double costThroughPivot = weights[i][k] + weights[k][j];
+					double costThroughPivot = aFloyd[i][k] + aFloyd[k][j];
 					if(costThroughPivot < aFloyd[i][j]) {
 						aFloyd[i][j] = costThroughPivot;
 						pFloyd[i][j] = k;
@@ -199,6 +207,21 @@ public class Graph<T> extends GraphAbstract<T> {
 				}
 	}
 
+	public String printFloydPath(T source, T target) {
+		int sourceIndex = getNode(source);
+		int targetIndex = getNode(target);
+		int pivot = pFloyd[sourceIndex][targetIndex];
+
+		return aFloyd[sourceIndex][targetIndex] == INFINITE ? "_NO_PATH_FOUND_TO_"
+				: recursivePrintFloyd(sourceIndex, pivot);
+	}
+
+	private String recursivePrintFloyd(int sourceIndex, int pivot) {
+		if(pivot == EMPTY)
+			return "";
+
+		return recursivePrintFloyd(sourceIndex, pFloyd[sourceIndex][pivot]) + nodes[pivot].toString();
+	}
 
 	public String recorridoProfundidad(T nodo) {
 		// Completad el metodo...
@@ -262,4 +285,5 @@ public class Graph<T> extends GraphAbstract<T> {
 				pFloyd[i][j] = EMPTY;
 			}
 	}
+
 }
