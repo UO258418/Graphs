@@ -208,22 +208,34 @@ public class Graph<T> extends GraphAbstract<T> {
 				}
 	}
 
-	public String printFloydPath(T source, T target) {
+	public String printFloydPath(T source, T target) throws ElementNotPresentException {
+		if(!existsNode(source))
+			throw new ElementNotPresentException(source + " is not present in the current graph.");
+
+		if(!existsNode(target))
+			throw new ElementNotPresentException(target + " is not present in the current graph.");
+
 		int sourceIndex = getNode(source);
 		int targetIndex = getNode(target);
 		int pivot = pFloyd[sourceIndex][targetIndex];
 
 		return aFloyd[sourceIndex][targetIndex] == INFINITE ? "_NO_PATH_FOUND_TO_"
-				: recursivePrintFloyd(sourceIndex, pivot);
+				: removeCharsFromEnd(
+					recursivePrintFloyd(sourceIndex, pivot) + recursivePrintFloyd(pivot, targetIndex),
+					target.toString().length()
+				);
 	}
 
 	private String recursivePrintFloyd(int sourceIndex, int pivot) {
-		if(pivot == EMPTY)
+		if(sourceIndex == EMPTY || pivot == EMPTY)
 			return "";
 
 		return recursivePrintFloyd(sourceIndex, pFloyd[sourceIndex][pivot]) + nodes[pivot].toString();
 	}
 
+	private String removeCharsFromEnd(String s, int numOfCharsToRemove) {
+		return (s == null || s.length() == 0) ? "" : (s.substring(0, s.length() - numOfCharsToRemove));
+	}
 
 	public String recorridoProfundidad(T nodo) {
 		// Completad el metodo...
